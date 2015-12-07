@@ -45,7 +45,7 @@ class Directorio(object):
     def getDirectory(self,path):
         # Para moverse entre subdirectorios forzamente debe 
         # de usarse este metodo que devuelve un objeto Directorio
-        if os.path.exist(path) and os.path.isdir(path):
+        if os.path.exists(path) and os.path.isdir(path):
             if path in self.dirs:
                 newdir = Directorio(path)
         else:
@@ -69,7 +69,12 @@ class Directorio(object):
             # TODO : lanzar excepcion
             print("El directorio %s esta fuera del alcanze del objeto",pathdir)
 
-        
+    def getListFiles(self):
+        for i in os.listdir(self.path):
+            if os.path.isfile(os.path.join(self.path,i)):
+                self.files.append(os.path.join(self.path,i))
+        return self.files
+
 
     def moveFile(self):
         pass
