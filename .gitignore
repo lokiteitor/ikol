@@ -58,3 +58,6 @@ target/
 
 
 music_conv.py
+conf/client_secret.json
+src/youtube/key-oauth2.json
+
