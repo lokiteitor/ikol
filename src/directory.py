@@ -1,3 +1,4 @@
+
 import os
 
 
@@ -78,3 +79,24 @@ class Directorio(object):
 
     def moveFile(self):
         pass
+
+    def createFile(self,path,msj=None,rw="w"):
+        # Crear un archivo con msj como contenido
+        # si msj es None crear solo un archivo vacio
+        # rw el modo de lectura/escritura
+
+        with open(path,rw) as fl:
+            if msj and type(msj) == "<type 'list'>":
+                for i in msj:
+                    fl.write(i+"\n")
+            elif msj and msj == "<type 'str'>":
+                fl.write(msj + "\n")
+
+    
+
+                        
+
+
+
+
+

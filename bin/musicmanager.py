@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2.7
 
 #Copyright (C) 2015  David Delgado Hernandez 
 # This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import sys
 import getopt
 
@@ -30,8 +29,8 @@ if __name__ == '__main__':
         
     except getopt.GetoptError:
         #TODO : Imprimir menu de ayuda
-        print("""\
-Uso: musicmanager [opciones] FUENTE DESTINO""")
+        print """\
+Uso: musicmanager [opciones] FUENTE DESTINO"""
 
     for opt, arg in options:
         if opt in ("-C" , "--clean"):
