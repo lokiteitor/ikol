@@ -88,8 +88,8 @@ class Directorio(object):
         # rw el modo de lectura/escritura
 
         with open(path,rw) as fl:
-            if msj and type(msj) == "<type 'list'>":
+            if msj and str(type(msj)) == "<type 'list'>":
                 for i in msj:
                     fl.write(i+"\n")
-            elif msj and msj == "<type 'str'>":
+            elif msj and str(type(msj)) == "<type 'str'>":
                 fl.write(msj + "\n")

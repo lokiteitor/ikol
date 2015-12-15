@@ -11,6 +11,7 @@ CACHE_DIR = os.environ["HOME"] + "/.cache/ikol"
 CODE_STORAGE = CONFIG_DIR + "/code_oauth.json" 
 CLIENT_SECRETS_FILE = CONFIG_DIR +"/client_secret.json"
 CONFIG_FILE = CONFIG_DIR + "/ikol.conf"
+URL_FILE = CONFIG_DIR + "/url.conf"
 
 
 ### Argumentos Comunes ### 
