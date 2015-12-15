@@ -8,7 +8,7 @@ from oauth2client.file import Storage
 from oauth2client.client import flow_from_clientsecrets
 from apiclient.discovery import build
 
-import var
+from ikol import var
 
 
 class Authorized(object):

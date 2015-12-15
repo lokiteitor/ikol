@@ -23,4 +23,14 @@ C.setFormat(130,True)
 
 print C.getFormat()
 
+URL = "https://www.youtube.com/watch?v=8lp20JFiB4s"
+
+C.addURL(URL)
+C.addURL(URL)
+
+lst = C.getAllURL()
+
+for i in lst:
+    print i
+
 

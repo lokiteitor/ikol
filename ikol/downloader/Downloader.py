@@ -1,8 +1,6 @@
-import os
 from subprocess import Popen,PIPE
 
 import var
-
 
 
 class Downloader(object):
@@ -15,11 +13,12 @@ class Downloader(object):
 
     def setCacheDir(self,path):
         # Para funcionar se debe proprocionar un directorio
-        # donde almacenar los videos que se esten descargando
-        if os.path.exists(path):
-            self.CACHE_DIR = path
-        else:
-            os.mkdir(path)
+        # donde almacenar los videos que se esten descargando}
+        # De la opcion %id se puede obtener el nombre
+        cachedir = self.CACHE_DIR + "/%(title)s-%(id)s.%(ext)s"
+
+        self.CACHE_DIR = cachedir
+
 
     def setFormat(self,format):
         # Establece un formato diferente al de defecto
@@ -34,7 +33,8 @@ class Downloader(object):
 
     def download(self):
         #devuelve el nombre del archivo
-        P = Popen(["youtube-dl","-f",str(self.format),"-ciq",self.URL],stdout=PIPE)
+        P = Popen(["youtube-dl","-o",self.CACHE_DIR,"-f",str(self.format),
+            "-ci",self.URL],stdout=PIPE)
 
         P.wait()
         # TODO : esto no devuelve nada asi que se debe comprobar manualmente

@@ -1,7 +1,7 @@
  Agregar Caracteristica:
 
 
-☐ Agregar las configuraciones por defecto tales como directorio de descargas y similares @high
+✔ Agregar las configuraciones por defecto tales como directorio de descargas y similares @high @done (15-12-15 14:03)
 ./var.py:24
 
 ☐ Personalizar Menu que va desde Authorized hasta el binario @low
@@ -14,8 +14,10 @@
 Manejo de posibles excepciones:
 ☐ Evitar duplicados en ese caso devolver la lista anterior @low
 ./APIRequest.py:17:9
-☐ Enviar mensaje de excepcion si no se encuentra el archivo client_secret @high
+✔ Enviar mensaje de excepcion si no se encuentra el archivo client_secret @high @done (15-12-15 14:02)
 ./initconf.py:28:13
+ ☐ Evitar duplicados en lista URL
+ ./config.py:113:13
 
 Manejo de Multitarea:
   ☐ En downloader revisar los formatos disponibles generan un retardo @high

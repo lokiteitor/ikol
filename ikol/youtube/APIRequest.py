@@ -1,4 +1,4 @@
-import var
+from ikol import var
 
 class APIRequest(object):
     """Maneja todas la solicitudes hacia el API youtube 

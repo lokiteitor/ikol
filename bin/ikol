@@ -15,10 +15,11 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-
 """
     Este archivo iniciara el entorno para la descarga de los videos
 """
+import getopt
+import sys
 
 from ikol.youtube.APIRequest import APIRequest
 from ikol.youtube.Auth import Authorized
@@ -26,7 +27,110 @@ from ikol.youtube.Auth import Authorized
 from ikol.config import Config
 
 
+def options(argv):
+    #leer los argumentos de linea de comandos
+    # El modulo config debe de revisar que esta url corresponde a un video 
+    # o a una playlist
+
+    keys = {
+        "url" : "",
+        "format" : 0,
+        "cache" : "",
+        "regurl": False,
+        "regformat" : False,
+        "regcache" : False
+    }
+
+    try:
+        options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:",
+                        ["add-url=","url=","video=","format=","set-format=",
+                        "cache=","dir-cache="])
+
+    except getopt.GetoptError:
+        # TODO : Manejar errores
+        print "el argumento no es valido"
+
+    for opt , arg in options:
+        
+        if opt in ("-A","--add-url"):
+            if arg:
+                keys["url"] = arg
+                keys["regurl"] = True
+            else:
+                print "La opcion necesita un argumento"
+
+        if opt in ("-a","--url"):
+            if arg:
+                keys["url"] = arg
+            else:
+                print "La opcion necesita un argumento"
+
+        if opt in ("-v","--video"):
+            if arg:
+                keys["url"] = arg
+            else:
+                print "La opcion necesita un argumento"
+
+        if opt in ("-f","--format"):
+            if arg:
+                keys["format"] = int(arg)
+            else:
+                print "La opcion necesita un argumento"
+
+        if opt in ("-F","--set-format"):
+            if arg:
+                keys["format"] = int(arg)
+                keys["regformat"] = True
+            else:
+                print "La opcion necesita un argumento"
+
+        if opt in ("-c","--cache"):
+            if arg:
+                keys["cache"] = arg
+            else:
+                print "La opcion necesita un argumento"
+
+        if opt in ("-C","--dir-cache"):
+            if arg:
+                keys["cache"] = arg
+                keys["regcache"] = True
+            else:
+                print "La opcion necesita un argumento"
+
+    return keys
 
 if __name__ == '__main__':
+    # Devuelve una diccionario con los argumentos establecidos
+    keys  = options(sys.argv[1:])
 
-    configuration = Config()
+    urllst = []
+
+
+    # Resolver todas las configuraciones
+
+    config = Config()
+
+    if keys["regcache"]:
+        config.setCacheDir(keys["cache"],True)
+    elif keys["cache"] != "":
+        config.setCacheDir(keys["cache"])
+
+    if keys["regformat"]:
+        config.setFormat(keys["format"],True)
+    elif keys["format"] != 0:
+        config.setFormat(keys["format"])
+
+    if keys["regurl"]:
+        config.addURL(keys["url"])
+    else:
+        # Agregar lista a objeto downloader
+        urllst.append(keys["url"])
+
+
+
+
+
+
+    print keys
+
+

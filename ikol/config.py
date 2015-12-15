@@ -50,7 +50,6 @@ class Config(directory.Directorio):
                 check[2] = True
 
         if check[0] == False:
-            # TODO : Enviar mensaje de excepcion
             raise AttributeError("No se encontro el archivo con la clave API")
         if check[1] == False:
             self.createFile(self.config_file,var.CONFIG_DEFAULT,rw="w")
@@ -107,4 +106,34 @@ class Config(directory.Directorio):
 
         return self.format
 
+    def addURL(self,URL):
+        # TODO : Revisar integridad del URL 
+        #       Si existe duplicado
+        #        Revisar que se una lista de reproduccion si no solo agregarla
+        #        temporalmente
+        with open(self.url_file,"a") as f:
+            f.write(URL+"\n")
+
+    def getAllURL(self):
+        # Devolver una lista con las url
+        urllist = []
+        try:
+            with open(self.url_file,"r") as f:
+                while True:
+                    url = f.readline()
+                    if not url:
+                        break
+                    urllist.append(url)
+
+            return urllist
+
+        except Exception, e:
+            # TODO: Lanzar aviso y log
+            print e
+            # crear el archivo
+            self.createFile(self.url_file,rw="w")
+            return []
+
         
+
+
