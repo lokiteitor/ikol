@@ -4,6 +4,7 @@ import os
 ### Directorios ### 
 
 CONFIG_DIR = os.environ["HOME"] + "/.config/ikol"
+CACHE_DIR = os.environ["HOME"] + "/.cache/ikol"
 
 
 ### Archivos ### 
@@ -19,13 +20,18 @@ YOUTUBE_API_VERSION = "v3"
 
 YOUTUBE_URL  = "https://www.youtube.com/watch?v="
 
+FORMAT_DEFAULT = 140
+
 
 ### Mensajes ### 
 MISSING_CLIENT_SECRETS_MESSAGE = "El archivo client_secret no se encuentra"
 
 # TODO: Agregar las configuraciones por defecto tales como directorio de
 #       descargas y similares
-CONFIG_DEFAULT = []
+CONFIG_DEFAULT = ["[DIRECTORIOS]",
+                    "CACHE_DIR="+CACHE_DIR,
+                    "[OPCIONES]",
+                    "FORMAT_DEFAULT="+str(FORMAT_DEFAULT)]
 
 
 

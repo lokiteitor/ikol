@@ -16,3 +16,8 @@ Manejo de posibles excepciones:
 ./APIRequest.py:17:9
 ☐ Enviar mensaje de excepcion si no se encuentra el archivo client_secret @high
 ./initconf.py:28:13
+
+Manejo de Multitarea:
+  ☐ En downloader revisar los formatos disponibles generan un retardo @high
+  ☐ En downloader las descargas generan un retardo  @high
+  

@@ -68,24 +68,24 @@ with open('out.log','w') as filelog:
     # TODO : Me devolvera videos eliminados estos abra que eliminarlos 
     #        de la playlist y de la cola de descarga
 
-    # filelog.write("\n\n")
+    filelog.write("\n\n")
 
-    # for x in playlst:
-    #     print x
+    for x in playlst:
+        print x
 
-    #     # Query para obtener el nombre de los videos y la ID parte de la
-    #     # URL de descarga
-    #     playlstitems = srv.playlistItems().list(
-    #         playlistId=x,
-    #         part="snippet",
-    #         fields="items/snippet/title,items/snippet/resourceId(videoId),nextPageToken,pageInfo,prevPageToken",
-    #         maxResults=50
-    #         ).execute()
+        # Query para obtener el nombre de los videos y la ID parte de la
+        # URL de descarga
+        playlstitems = srv.playlistItems().list(
+            playlistId=x,
+            part="snippet",
+            fields="items/snippet/title,items/snippet/resourceId(videoId),nextPageToken,pageInfo,prevPageToken",
+            maxResults=50
+            ).execute()
 
-    #     # TODO : Manejar posibles errores desde google
-    #     respd = playlstitems["items"][0]
+        # TODO : Manejar posibles errores desde google
+        respd = playlstitems["items"][0]
 
-    #     print respd["snippet"]["title"]
+        print respd["snippet"]["title"]
 
 
 

@@ -11,6 +11,8 @@ class APIRequest(object):
         self.lstplaylists = []
         #[(playlistID,[(title,VideosID])]
         self.videos = []
+        # {playlistID:[videoId]}
+        self.blacklist = {}
 
         
     def getVideosList(self,playlistID):
@@ -120,7 +122,20 @@ class APIRequest(object):
         # se encarga de marcar y separar los videos eliminados
         # luego de ello devuelve una lista de URL+ID validos
         lstrq = []
+
+        # if not self.blacklist.has_key(playlistID):
+        #     self.blacklist[playlistID] = []
+
         for i in lst:
+
+            # if i[0] == "Deleted video":
+            #     # Eliminar este video de la lista y pasarla a una lista
+            #     # para su posterior eliminacion
+            #     # TODO : Al parecer los datos extraidos no son lo sufientemente
+            #     # confiables como para aplicar esta operacion
+            #     self.blacklist[playlistID].append(i[1])
+            #     x = lst.index(i)
+            #     del(lst[x])
             idstr = i[1]
 
             URL = var.YOUTUBE_URL + idstr

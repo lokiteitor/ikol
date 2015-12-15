@@ -3,11 +3,9 @@
 import os
 import sys
 
-
 this_dir = os.path.dirname(os.path.abspath(__file__))
 trunk_dir = os.path.split(this_dir)[0]
 sys.path.insert(0,trunk_dir+"/src")
-
 
 from youtube import Auth
 from youtube import APIRequest
@@ -38,4 +36,7 @@ print len(lst)
 
 print API.videos
 
-print API.FormatLst(lst)
+print API.FormatLst(API.lstplaylists[5][1],lst)
+
+print API.blacklist
+

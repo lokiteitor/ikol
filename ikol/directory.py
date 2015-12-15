@@ -71,6 +71,8 @@ class Directorio(object):
             print("El directorio %s esta fuera del alcanze del objeto",pathdir)
 
     def getListFiles(self):
+        # Obtener lista de archivos en el primer nivel
+        self.files = [] 
         for i in os.listdir(self.path):
             if os.path.isfile(os.path.join(self.path,i)):
                 self.files.append(os.path.join(self.path,i))
@@ -91,12 +93,3 @@ class Directorio(object):
                     fl.write(i+"\n")
             elif msj and msj == "<type 'str'>":
                 fl.write(msj + "\n")
-
-    
-
-                        
-
-
-
-
-
