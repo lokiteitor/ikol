@@ -27,7 +27,7 @@ class Config(directory.Directorio):
         self.format = var.FORMAT_DEFAULT
 
         # revisar la integridad antes de continuar
-        self.CheckDirectory()
+        self._CheckDirectory()
         self.cfgfile = ConfigParser()
         self.cfgfile.read(self.config_file)
         # Si todo esta bien requerir las configuraciones hechas por el
@@ -38,7 +38,7 @@ class Config(directory.Directorio):
         # CACHE_DIR,URL_FILE,FORMAT_DEFAULT
         self.reg = [False,False,False]
 
-    def CheckDirectory(self):
+    def _CheckDirectory(self):
         # Registro: (Client_secret,Archivo de Configuracion,URL.conf)
         check = [False,False,False]
         for i in self.getListFiles():
@@ -123,7 +123,9 @@ class Config(directory.Directorio):
                     url = f.readline()
                     if not url:
                         break
-                    urllist.append(url)
+                    url = url.replace("\n","")
+                    if len(url) > 0:
+                        urllist.append(url)
 
             return urllist
 

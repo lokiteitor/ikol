@@ -19,8 +19,9 @@ class Authorized(object):
         super(Authorized, self).__init__()
         # Puede pasar argumentos a la linea de comandos
         # TODO : se puede crear un menu - personalizar
-        self.parser = argparse.ArgumentParser(parents=[tools.argparser])
-        self.args = self.parser.parse_args()
+        #        Posible error al pasar los argumentos durante la autorizacion
+        # self.parser = argparse.ArgumentParser(parents=[tools.argparser])
+        # self.args = self.parser.parse_args()
         self.client_secret = client_secret
 
 
@@ -45,7 +46,7 @@ class Authorized(object):
             # NOTA Revisar webbrowser libreria estandar
             # Redirigir el navegador a una pagina con javascript para cerrar
             # Para ello debemos usar otro metodo para obtener las credenciales
-            self.credentials = tools.run_flow(self.flow, self.storage, self.args)        
+            self.credentials = tools.run_flow(self.flow, self.storage)        
 
 
     def getService(self):
