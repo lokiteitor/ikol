@@ -5,6 +5,8 @@ import os
 
 CONFIG_DIR = os.environ["HOME"] + "/.config/ikol"
 CACHE_DIR = os.environ["HOME"] + "/.cache/ikol"
+# TODO : utilizar las variables XDG
+FINAL_DIR = os.environ["HOME"] + "/Musica"
 
 
 ### Archivos ### 
@@ -31,6 +33,7 @@ MISSING_CLIENT_SECRETS_MESSAGE = "El archivo client_secret no se encuentra"
 #       descargas y similares
 CONFIG_DEFAULT = ["[DIRECTORIOS]",
                     "CACHE_DIR="+CACHE_DIR,
+                    "FINAL_DIR="+FINAL_DIR,
                     "[OPCIONES]",
                     "FORMAT_DEFAULT="+str(FORMAT_DEFAULT)]
 

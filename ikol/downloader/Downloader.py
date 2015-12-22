@@ -26,6 +26,7 @@ class Downloader(object):
         # Para funcionar se debe proprocionar un directorio
         # donde almacenar los videos que se esten descargando}
         # De la opcion %id se puede obtener el nombre
+        self.CACHE_DIR = path
         cachedir = self.CACHE_DIR + "/%(title)s-%(id)s.%(ext)s"
 
         self.PATH_TO_FILE = cachedir
@@ -90,8 +91,15 @@ class Downloader(object):
         #obtener la extencion
         # identificar el archivo que contiene ese id en el directorio
         for i in os.listdir(self.CACHE_DIR):
-            if id in i and self.ext in i:
-                name = i
+            try:
+                # TODO : UnicodeDecodeError: 'ascii' codec can't decode byte
+                # 0xc3 in position 55: ordinal not in range(128)
+                if id in i and self.ext in i:
+                    name = i
+            except Exception, e:
+                print e
+                name = self.URL
+
 
 
         # TODO : esto no devuelve nada asi que se debe comprobar manualmente

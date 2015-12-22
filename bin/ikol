@@ -31,6 +31,9 @@ from ikol.youtube.APIRequest import APIRequest
 from ikol.youtube.Auth import Authorized
 
 from ikol.config import Config
+from ikol.downloader.Downloader import Downloader
+
+from ikol.directory import Directorio
 
 
 def options(argv):
@@ -105,6 +108,40 @@ def options(argv):
 
     return keys
 
+def downloadlist(playlist,API):
+    idname = playlist.partition("playlist?list=")[2]
+    # verificar la existencia de la playlist
+    if not idname in API.getSecondPeer(API.getPlaylists()):
+        # TODO : Lanzar error y log
+        return
+    # verificar el nombre de la playlist para 
+    # identificar el directorio
+    name = API.getNameList(idname)
+
+    path = config.getCacheDir() + "/" + name
+    Dir = Directorio(config.getCacheDir())
+    Dir.createSubDir(path)
+    # obtener el ID de la playlist
+
+    lst = API.getVideosList(idname)
+
+    links = API.FormatLst(lst)
+    for x in links:
+        y = links.index(x)
+        print "Descargando: " + lst[y][0]
+        D = Downloader(x)
+
+        D.setCacheDir(path)
+
+        D.setFormat(config.getFormat())
+        # TODO : Hacer barra de progreso 
+        print "Descargado " + D.download()
+
+
+
+# Declando global
+config = Config()
+
 if __name__ == '__main__':
     # Devuelve una diccionario con los argumentos establecidos
     keys  = options(sys.argv[1:])
@@ -114,7 +151,7 @@ if __name__ == '__main__':
 
     # Resolver todas las configuraciones
 
-    config = Config()
+    
 
     if keys["regcache"]:
         config.setCacheDir(keys["cache"],True)
@@ -162,8 +199,10 @@ if __name__ == '__main__':
     API = APIRequest(service)
 
     for i in urllst:
-        # obtener el ID de la playlist
-        idname = i.partition("playlist?list=")[2]
-        print idname
-        lst = API.getVideosList(idname)
+        downloadlist(i,API)
+
+
+
+    print "Tarea Finalizada"
+
         

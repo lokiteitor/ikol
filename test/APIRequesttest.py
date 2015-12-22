@@ -5,17 +5,16 @@ import sys
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 trunk_dir = os.path.split(this_dir)[0]
-sys.path.insert(0,trunk_dir+"/src")
+sys.path.insert(0,trunk_dir)
 
-from youtube import Auth
-from youtube import APIRequest
-
+from ikol.youtube.APIRequest import APIRequest
+from ikol.youtube.Auth import Authorized
 
 conf = trunk_dir + "/conf/client_secret.json"
 
 sto = trunk_dir + "/conf/oauth.json"
 
-A = Auth.Authorized(conf)
+A = Authorized(conf)
 
 A.getFlow()
 
@@ -23,7 +22,7 @@ A.setStorage(sto)
 
 srv = A.getService()
 
-API = APIRequest.APIRequest(srv)
+API = APIRequest(srv)
 
 print API.getPlaylists()
 
@@ -36,7 +35,10 @@ print len(lst)
 
 print API.videos
 
-print API.FormatLst(API.lstplaylists[5][1],lst)
 
-print API.blacklist
+
+print API.getSecondPeer(API.getPlaylists())
+
+for i in API.getPlaylists():
+    print API.getNameList(i[1])
 

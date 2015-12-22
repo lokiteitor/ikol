@@ -21,7 +21,8 @@ class Config(directory.Directorio):
 
         # Directorios secundarios
         # TODO : si se establece manualmente revisar que no se sobrepongan
-        self.CACHE_DIR = self.getCacheDir
+        self.CACHE_DIR = self.getCacheDir()
+        self.FINAL_DIR = self.getFinalDir()
 
         # Opciones
         self.format = var.FORMAT_DEFAULT
@@ -35,8 +36,8 @@ class Config(directory.Directorio):
 
         # si el usuario marco manualmente una configuracion no persistente verlo
         # aqui
-        # CACHE_DIR,URL_FILE,FORMAT_DEFAULT
-        self.reg = [False,False,False]
+        # CACHE_DIR,URL_FILE,FORMAT_DEFAULT,FINAL_DIR
+        self.reg = [False,False,False,False]
 
     def _CheckDirectory(self):
         # Registro: (Client_secret,Archivo de Configuracion,URL.conf)
@@ -105,6 +106,33 @@ class Config(directory.Directorio):
                 self.cfgfile.write(f)
 
         return self.format
+
+    def setFinalDir(self,path,flag=False):
+        self.reg[3] = True
+        if not os.path.exists(path):
+            os.mkdir(path)
+        # si se debe establecer por persistente 
+        self.FINAL_DIR = path
+        if flag:
+            self.cfgfile.set("DIRECTORIOS","FINAL_DIR",path)
+            with open(self.config_file,"w") as f:
+                self.cfgfile.write(f)
+
+        return self.FINAL_DIR
+
+    def getFinalDir(self):
+        if self.reg[3]:
+            # Si el usuario lo modifico no hacer nada y dar la respuesta de 
+            # usuario
+            pass
+        elif self.cfgfile.has_option("DIRECTORIOS","FINAL_DIR"):
+            self.FINAL_DIR = self.cfgfile.get("DIRECTORIOS","FINAL_DIR")
+
+        else:
+            # si no la dio ni esta en fichero de configuracion
+            self.cfgfile.set("DIRECTORIOS","FINAL_DIR",var.FINAL_DIR)
+
+        return self.FINAL_DIR
 
     def addURL(self,URL):
         # TODO : Revisar integridad del URL 

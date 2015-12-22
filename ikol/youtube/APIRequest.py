@@ -110,6 +110,12 @@ class APIRequest(object):
                 else:
                     next = False
 
+
+        if len(self.lstplaylists) != 0:
+            for i in self.lstplaylists:
+                self.lstplaylists.pop()
+
+
         for i in rq:
             for x in i["items"]:
                 self.lstplaylists.append((x["snippet"]["title"],x["id"]))
@@ -143,4 +149,21 @@ class APIRequest(object):
             lstrq.append(URL)
 
         return lstrq
+
+    def getSecondPeer(self,lst):
+        lstrq = []
+        for i in lst:
+            lstrq.append(i[1])
+        return lstrq
+
+    def getNameList(self,idlst):
+        self.getPlaylists()
+
+        for i in self.lstplaylists:
+            if idlst == i[1]:
+
+                name = i[0]
+
+        return name
+
 
