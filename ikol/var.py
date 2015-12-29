@@ -14,6 +14,7 @@ CODE_STORAGE = CONFIG_DIR + "/code_oauth.json"
 CLIENT_SECRETS_FILE = CONFIG_DIR +"/client_secret.json"
 CONFIG_FILE = CONFIG_DIR + "/ikol.conf"
 URL_FILE = CONFIG_DIR + "/url.conf"
+DB_PATH = CONFIG_DIR + "/history.db"
 
 
 ### Argumentos Comunes ### 
