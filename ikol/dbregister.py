@@ -1,7 +1,6 @@
 
 import sqlite3
 import os
-import datetime
 
 class DataBase(object):
     """Si la base de datos no exite iniciar los valores por defecto"""
@@ -107,15 +106,15 @@ class DataBase(object):
         
         t = (IDplaylist)
         QUERY = "SELECT * FROM playlist WHERE IDplaylist=?"
-        req = cursr.execute(QUERY,t)
+        req = cursr.execute(QUERY,t).fetchall()
 
-        # TODO : Darle formato a los datos devueltos
         Conn.close()
         return req
 
 
     def movePath(self,name,pathabs):
         # Cambiar el lugar donde se encuentre el archivo
+        # Haci es posible llevar un control sobre el cambio de nombres
         pass
 
 
