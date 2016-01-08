@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 
 
@@ -6,7 +7,7 @@ import os
 CONFIG_DIR = os.environ["HOME"] + "/.config/ikol"
 CACHE_DIR = os.environ["HOME"] + "/.cache/ikol"
 # TODO : utilizar las variables XDG
-FINAL_DIR = os.environ["HOME"] + "/Musica"
+FINAL_DIR = os.environ["HOME"] + "/Música"
 
 
 ### Archivos ### 
