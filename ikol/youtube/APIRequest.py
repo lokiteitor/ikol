@@ -1,4 +1,21 @@
+#Copyright (C) 2015  David Delgado Hernandez 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+import logging
+
 from ikol import var
+
 
 class APIRequest(object):
     """Maneja todas la solicitudes hacia el API youtube 
@@ -10,15 +27,11 @@ class APIRequest(object):
         # [(title,playlistID)]
         self.lstplaylists = []
         #[(playlistID,[(title,VideosID])]
-        self.videos = []
         # {playlistID:[videoId]}
         self.blacklist = {}
 
         
     def getVideosList(self,playlistID):
-        # TODO : Evitar duplicados en ese caso devolver la lista anterior o
-        #        reemplazarla en self.videos
-
         # Recibe un ID de playlistID
         # Devuelve una lista de ID de los videos que conforman la playlist
 
@@ -63,13 +76,11 @@ class APIRequest(object):
             for x in i["items"]:
                 lst.append((x["snippet"]["title"],x["snippet"]["resourceId"]["videoId"]))
 
-        self.videos.append((playlistID,lst))
-
+        logging.debug(str(lst))
         return lst
 
     def getPlaylists(self):
         
-
         request = self.srv.playlists().list(
                 part="id,snippet",
                 mine="true",
@@ -78,11 +89,6 @@ class APIRequest(object):
                 ).execute()
 
         rq = [request]
-        #TODO : si los numeros de elementos de playlists o los videos de playlist
-      # exceden en numero al parametro maxResults. la respuesta generara un token
-      # nextPageToken utilizar este para recorrer a los siguientes resultados y
-      # concatenarlos al anterior
-      # totalResults y resultsPerPage pueden resultar utiles
 
       # Revisar si la respuesta excede en tamano en ese caso realizar 
       # la solicituda las veces necesarias
@@ -112,14 +118,12 @@ class APIRequest(object):
 
 
         if len(self.lstplaylists) != 0:
-            for i in self.lstplaylists:
-                self.lstplaylists.pop()
-
+            self.lstplaylists = []
 
         for i in rq:
             for x in i["items"]:
                 self.lstplaylists.append((x["snippet"]["title"],x["id"]))
-
+        logging.debug(str(self.lstplaylists))
         return self.lstplaylists
 
 

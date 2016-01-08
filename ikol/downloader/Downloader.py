@@ -12,12 +12,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-
-
 from subprocess import Popen,PIPE
 import string
-import os
+import logging
 
 import var
 
@@ -82,6 +79,7 @@ class Downloader(object):
                 # Si llega hasta aqui debo encontrar el indice
             except Exception, e:
                 # TODO : genera un error Index manejarlo
+                logging.debug(e)
                 break
                 print e
 
@@ -102,7 +100,7 @@ class Downloader(object):
         if P.wait() == 0:
             codereturn = True
         else:
-            # TODO : log the error
+            logging.debug(P.stdout.read())
             codereturn = False
 
         print P.stdout.read()

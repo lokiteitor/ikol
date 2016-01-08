@@ -21,7 +21,7 @@
 """
 import getopt
 import sys
-
+import logging
 import os
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -37,6 +37,12 @@ from ikol.directory import Directorio
 
 # Declaracion global
 config = Config()
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s : %(levelname)s : %(message)s',
+    filename = config.getLogFile(),
+    filemode='a')
+
 
 ####################### Funciones de Apoyo #######################
 
@@ -59,12 +65,11 @@ def RevisarPlaylist(playlist):
     API = APIRequest(S)
     # verificar la existencia de la playlist
     if not idname in API.getSecondPeer(API.getPlaylists()):
-        # TODO : Lanzar error y log
-        #        Retirar de lista de playlist
+        # TODO : Retirar de lista de playlist
+        print "La playlist " + idname +" no existe"
+        logging.warning("La playlist " + idname +" no existe")
         videos = []
         return  
-
-
     videos = API.getVideosList(idname)
 
     return videos
@@ -75,7 +80,7 @@ def getHistory(playlist):
     # Si no existe registro de la playlist crearlo
     idname = playlist.partition("playlist?list=")[2]
     DB = DataBase()
-
+    # TODO : Crea varias entradas en la base de datos
     if DB.playlistExist(idname) == False:        
         API = APIRequest(getAuth())
         lstname = API.getNameList(idname)
@@ -83,7 +88,6 @@ def getHistory(playlist):
 
     videohst = DB.getAllVideosByPlaylist(idname)
 
-    print videohst
     return videohst
 
 def FiltrarRepetidos(video,videohst):
@@ -95,21 +99,24 @@ def FiltrarRepetidos(video,videohst):
         for x in videohst:
             if i[1] == x[0]:
                 # Eliminar el elemento de la lista video
-                print x
+                logging.debug(i[1]+ " video repetido" )
                 video.remove(i)
                 continue
-    print video
     return video
 
 def Download(playlist,videos):
     # Descargar los videos
     # Crear un directorio con el nombre de la playlist en el directorio cache
     idname = playlist.partition("playlist?list=")[2]
+    print "Preparandose para descargar " + idname
+    logging.info("Descargando " + idname)
     API = APIRequest(getAuth())
     lstname = API.getNameList(idname)
 
     DB = DataBase()
-    D = Directorio(config.getCacheDir() +"/"+lstname)
+    cache = os.path.join(config.getCacheDir(),lstname)
+    D = Directorio(cache)
+    logging.info("Directorio cache "+ cache)
     # Separar la lista de videos,nombre descargar el video
     ready = []
     for i in videos:
@@ -120,12 +127,14 @@ def Download(playlist,videos):
         # TODO : Genera un retardo
         Down.setFormat(config.getFormat())
         Down.setCacheDir(D.path)
-
+        print "Descargando video " + i[0]
+        logging.info("Inicio Descarga " + i[0])
         if Down.download():
             # Si todo salio bien registrarlo en el historial
             # Obtener el nombre del archivo 
             path = os.path.splitext(i[0])[0] +"."+ Down.ext
             print "Descarga de " + path + " finalizo correctamente"
+            logging.info("Descarga de " + path + " finalizada")
 
             if D.FileinDir(path):
                 path = D.FileinDir(path)
@@ -134,12 +143,13 @@ def Download(playlist,videos):
                 DB.insertVideo(idvideo,idname,path)
                 ready.append(path)
             else:
-                # TODO : log error
-                print "Error al buscar el archivo"
+                print "Error Al buscar el archivo " + path
+                logging.debug("Error al buscar el archivo " + path)
         else:
-            # TODO : log error
-            print "Error al descargar el video"
-            pass
+            print "Error al descargar el video " +i[0]
+            logging.warning("Error al descargar el video " +i[0])
+
+    logging.debug("Archivos listos " + str(ready))
     return ready
 
 def moveToDest(listfiles):
@@ -148,14 +158,20 @@ def moveToDest(listfiles):
     dest = config.getFinalDir()
 
     for i in listfiles:
-        D.moveToDest(i,dest)
+        try:
+
+            print "Moviendo "+ D.path +" hacia " + dest
+            logging.debug("Moviendo " + dest)
+            D.moveToDest(i,dest)
+        except Exception, e:
+            #TODO : hacer algo con este error decode ascii en print
+            print e
+            logging.debug(e)
 
 
 def options(argv):
     # leer los argumentos de linea de comandos
     # Armar el objeto config para la configuracion global
-
-
     keys = {
         "url" : "",
         "format" : 0,
@@ -167,7 +183,7 @@ def options(argv):
         "regdest" : False,
         "dest" : ""
     }
-
+    # TODO : Lanzar excepciones que detengan la ejecucion del programa
     try:
         options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:D:i",
                         ["add-url=","url=","video=","format=","set-format=",
@@ -270,6 +286,7 @@ def ArmarConfig(keys):
 
 
 if __name__ == '__main__':
+    logging.info("\n\nInicio de operaciones")
     # Devuelve una diccionario con los argumentos establecidos
     keys  = options(sys.argv[1:])
 
@@ -285,13 +302,15 @@ if __name__ == '__main__':
     for i in urllst:
         if len(i) == 0:
             urllst.remove(i)
-
+    logging.debug("urllst "+ str(urllst))
 
     for i in urllst:
         # TODO : Realizar el multihilo
         videos = RevisarPlaylist(i)
         if len(videos) == 0:
             # Saltarse la playlist
+            logging.warning("Playlist vacia" + i)
+            print i + "vacia"
             continue
 
         historial = getHistory(i)
@@ -306,3 +325,4 @@ if __name__ == '__main__':
         moveToDest(cache)
         # Eliminar los archivos erroneos
 
+    logging.info("Finaliza operaciones")

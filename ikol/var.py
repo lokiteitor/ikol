@@ -16,6 +16,7 @@ CLIENT_SECRETS_FILE = CONFIG_DIR +"/client_secret.json"
 CONFIG_FILE = CONFIG_DIR + "/ikol.conf"
 URL_FILE = CONFIG_DIR + "/url.conf"
 DB_PATH = CONFIG_DIR + "/history.db"
+LOG_FILE = CONFIG_DIR + "/ikol.log"
 
 
 ### Argumentos Comunes ### 

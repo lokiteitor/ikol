@@ -197,6 +197,9 @@ class Config(directory.Directorio):
             # si no  esta en fichero de configuracion
             self.cfgfile.set("OPCIONES","DELETE_WRONG_LIST","YES")
 
-        return self.DELETE_WRONG_LIST        
+        return self.DELETE_WRONG_LIST
+
+    def getLogFile(self):
+        return var.LOG_FILE
 
 
