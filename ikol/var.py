@@ -36,7 +36,8 @@ CONFIG_DEFAULT = ["[DIRECTORIOS]",
                     "CACHE_DIR="+CACHE_DIR,
                     "FINAL_DIR="+FINAL_DIR,
                     "[OPCIONES]",
-                    "FORMAT_DEFAULT="+str(FORMAT_DEFAULT)]
+                    "FORMAT_DEFAULT="+str(FORMAT_DEFAULT),
+                    "DELETE_WRONG_LIST=YES"]
 
 
 

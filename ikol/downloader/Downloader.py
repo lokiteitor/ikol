@@ -27,7 +27,7 @@ class Downloader(object):
         # donde almacenar los videos que se esten descargando}
         # De la opcion %id se puede obtener el nombre
         self.CACHE_DIR = path
-        cachedir = self.CACHE_DIR + "/%(title)s-%(id)s.%(ext)s"
+        cachedir = self.CACHE_DIR + "/%(title)s.%(ext)s"
 
         self.PATH_TO_FILE = cachedir
 
@@ -82,33 +82,11 @@ class Downloader(object):
         P = Popen(["youtube-dl","-o",self.PATH_TO_FILE,"-f",str(self.format),
             "-ci",self.URL],stdout=PIPE)
         if P.wait() == 0:
+            codereturn = True
+        else:
             # TODO : log the error
-            pass
+            codereturn = False
 
-        name = ""
-        # Obtener el id del video
-        id = self.URL.partition("?v=")[2]
-        #obtener la extencion
-        # identificar el archivo que contiene ese id en el directorio
-        for i in os.listdir(self.CACHE_DIR):
-            try:
-                # TODO : UnicodeDecodeError: 'ascii' codec can't decode byte
-                # 0xc3 in position 55: ordinal not in range(128)
-                if id in i and self.ext in i:
-                    name = i
-            except Exception, e:
-                print e
-                name = self.URL
-
-
-
-        # TODO : esto no devuelve nada asi que se debe comprobar manualmente
-        # o por el codigo 0 de P.wait()
         print P.stdout.read()
 
-        return name
-
-
-
-
-        
+        return codereturn        

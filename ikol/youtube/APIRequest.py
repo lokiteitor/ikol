@@ -123,32 +123,10 @@ class APIRequest(object):
         return self.lstplaylists
 
 
-    def FormatLst(self,lst):
-        # La lista de archivos que genere el objeto debe pasar por aqui
-        # se encarga de marcar y separar los videos eliminados
-        # luego de ello devuelve una lista de URL+ID validos
-        lstrq = []
-
-        # if not self.blacklist.has_key(playlistID):
-        #     self.blacklist[playlistID] = []
-
-        for i in lst:
-
-            # if i[0] == "Deleted video":
-            #     # Eliminar este video de la lista y pasarla a una lista
-            #     # para su posterior eliminacion
-            #     # TODO : Al parecer los datos extraidos no son lo sufientemente
-            #     # confiables como para aplicar esta operacion
-            #     self.blacklist[playlistID].append(i[1])
-            #     x = lst.index(i)
-            #     del(lst[x])
-            idstr = i[1]
-
-            URL = var.YOUTUBE_URL + idstr
-
-            lstrq.append(URL)
-
-        return lstrq
+    def FormatURL(self,idvideo):
+        # Dar formato de URL valido
+        URL = var.YOUTUBE_URL + idvideo
+        return URL
 
     def getSecondPeer(self,lst):
         lstrq = []

@@ -4,11 +4,11 @@ import os
 
 this_dir = os.path.dirname(os.path.abspath(__file__))
 trunk_dir = os.path.split(this_dir)[0]
-sys.path.insert(0,trunk_dir+"/ikol")
+sys.path.insert(0,trunk_dir)
 
-import var
+from ikol import var
 
-from  downloader.Downloader import Downloader
+from ikol.downloader.Downloader import Downloader
 
 
 

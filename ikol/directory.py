@@ -1,6 +1,7 @@
 
 import os
-
+import shutil
+import string
 
 # Clase que representa un directorio y que su funcion es toda la
 # gestion de los ficheros
@@ -78,9 +79,20 @@ class Directorio(object):
                 self.files.append(os.path.join(self.path,i))
         return self.files
 
+    def getBaseFiles(self):
+        lst = []
+        for i in os.listdir(self.path):
+            if os.path.isfile(os.path.join(self.path,i)):
+                lst.append(i)
+        return lst
 
-    def moveFile(self):
-        pass
+    def FileinDir(self,name):
+        if name in self.getBaseFiles():
+            path = os.path.join(self.path,name)
+        else:
+            path = False
+
+        return path    
 
     def createFile(self,path,msj=None,rw="w"):
         # Crear un archivo con msj como contenido
@@ -93,3 +105,37 @@ class Directorio(object):
                     fl.write(i+"\n")
             elif msj and str(type(msj)) == "<type 'str'>":
                 fl.write(msj + "\n")
+
+
+    def CleanName(self,path):
+        # Limpia el nombre del archivo de extenciones, puntaciones
+        # y caracteres no ascii
+        name = os.path.basename(path)
+        ext = os.path.splitext(name)[1]
+        name  = os.path.splitext(name)[0]
+        for x in name:
+            if not x in string.printable:
+                name = name.replace(x,'')
+
+        for i in string.punctuation:
+            if i == '_':
+                name = name.replace(i,' ')
+            else:
+                name = name.replace(i,'')
+
+        newpath = os.path.dirname(path) + "/" + name + ext
+        # TODO : Implementar Filtro de palabras
+        shutil.move(path,newpath)
+
+        return newpath
+    def moveToDest(self,orig,dest):
+        
+        if not os.path.exists(dest):
+            try:
+                os.mkdir(dest)
+            except Exception, e:
+                raise e
+
+        shutil.move(orig,dest)
+
+        return os.path.join(dest,os.path.basename(orig))

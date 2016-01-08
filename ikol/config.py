@@ -18,12 +18,10 @@ class Config(directory.Directorio):
         self.storage_path = var.CODE_STORAGE
         self.config_file = var.CONFIG_FILE
         self.url_file = var.URL_FILE
-
-        # Directorios secundarios
-        # TODO : si se establece manualmente revisar que no se sobrepongan
-        self.CACHE_DIR = self.getCacheDir()
-        self.FINAL_DIR = self.getFinalDir()
-
+        # si el usuario marco manualmente una configuracion no persistente verlo
+        # aqui
+        # CACHE_DIR,URL_FILE,FORMAT_DEFAULT,FINAL_DIR
+        self.reg = [False,False,False,False]
         # Opciones
         self.format = var.FORMAT_DEFAULT
 
@@ -34,10 +32,11 @@ class Config(directory.Directorio):
         # Si todo esta bien requerir las configuraciones hechas por el
         # usuario en el archivo de configuracion
 
-        # si el usuario marco manualmente una configuracion no persistente verlo
-        # aqui
-        # CACHE_DIR,URL_FILE,FORMAT_DEFAULT,FINAL_DIR
-        self.reg = [False,False,False,False]
+        # Directorios secundarios
+        # TODO : si se establece manualmente revisar que no se sobrepongan
+        self.CACHE_DIR = self.getCacheDir()
+        self.FINAL_DIR = self.getFinalDir()
+
 
     def _CheckDirectory(self):
         # Registro: (Client_secret,Archivo de Configuracion,URL.conf)
@@ -131,16 +130,23 @@ class Config(directory.Directorio):
         else:
             # si no la dio ni esta en fichero de configuracion
             self.cfgfile.set("DIRECTORIOS","FINAL_DIR",var.FINAL_DIR)
+            self.FINAL_DIR = var.FINAL_DIR
 
         return self.FINAL_DIR
 
+
     def addURL(self,URL):
         # TODO : Revisar integridad del URL 
-        #       Si existe duplicado
-        #        Revisar que se una lista de reproduccion si no solo agregarla
-        #        temporalmente
+        lst = self.getAllURL()
+
+        if URL in lst:
+            dup = True
+        else:
+            dup = False
+
         with open(self.url_file,"a") as f:
-            f.write(URL+"\n")
+            if dup == False:
+                f.write(URL+"\n")
 
     def getAllURL(self):
         # Devolver una lista con las url
@@ -164,6 +170,15 @@ class Config(directory.Directorio):
             self.createFile(self.url_file,rw="w")
             return []
 
+    def getDelWrongList(self):
         
+        if self.cfgfile.has_option("OPCIONES","DELETE_WRONG_LIST"):
+            self.DELETE_WRONG_LIST = self.cfgfile.get("OPCIONES","DELETE_WRONG_LIST")
+
+        else:
+            # si no  esta en fichero de configuracion
+            self.cfgfile.set("OPCIONES","DELETE_WRONG_LIST","YES")
+
+        return self.DELETE_WRONG_LIST        
 
 

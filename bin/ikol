@@ -29,17 +29,131 @@ sys.path.insert(0,trunk_dir)
 
 from ikol.youtube.APIRequest import APIRequest
 from ikol.youtube.Auth import Authorized
-
+from ikol.dbregister import DataBase
 from ikol.config import Config
 from ikol.downloader.Downloader import Downloader
-
 from ikol.directory import Directorio
+
+# Declaracion global
+config = Config()
+
+####################### Funciones de Apoyo #######################
+
+def getAuth():
+    
+    # Objeto del que se obtendran la conexiones con el api
+    Auth = Authorized(config.client_secret)
+    Auth.getFlow()
+    Auth.setStorage(config.storage_path)
+    service = Auth.getService()
+
+    return service
+
+
+def RevisarPlaylist(playlist):
+    # Obtiene los datos de la playlist 
+    # Devuelve los id de las canciones en lista
+    idname = playlist.partition("playlist?list=")[2]
+    S = getAuth()
+    API = APIRequest(S)
+    # verificar la existencia de la playlist
+    if not idname in API.getSecondPeer(API.getPlaylists()):
+        # TODO : Lanzar error y log
+        #        Retirar de lista de playlist
+        videos = []
+        return  
+
+
+    videos = API.getVideosList(idname)
+
+    return videos
+
+
+def getHistory(playlist):
+    # Obtener todos los archivos que ya se descargaron en el pasado
+    # Si no existe registro de la playlist crearlo
+    idname = playlist.partition("playlist?list=")[2]
+    DB = DataBase()
+
+    if DB.playlistExist(idname) == False:        
+        API = APIRequest(getAuth())
+        lstname = API.getNameList(idname)
+        DB.insertPlaylist(playlist,lstname)
+
+    videohst = DB.getAllVideosByPlaylist(idname)
+
+    print videohst
+    return videohst
+
+def FiltrarRepetidos(video,videohst):
+    # Se recibe la lista que proporciona la api 
+    # asi que se deben separar la tupla luego comparar con el historial +
+    # devolver una lista de tuplas con videos repetidos eliminados
+    # [(name,idvideo)]
+    for i in video:
+        for x in videohst:
+            if i[1] == x[0]:
+                # Eliminar el elemento de la lista video
+                print x
+                video.remove(i)
+                continue
+    print video
+    return video
+
+def Download(playlist,videos):
+    # Descargar los videos
+    # Crear un directorio con el nombre de la playlist en el directorio cache
+    idname = playlist.partition("playlist?list=")[2]
+    API = APIRequest(getAuth())
+    lstname = API.getNameList(idname)
+
+    DB = DataBase()
+    D = Directorio(config.getCacheDir() +"/"+lstname)
+    # Separar la lista de videos,nombre descargar el video
+    ready = []
+    for i in videos:
+        # Descargar el video
+        idvideo = i[1]
+        url = API.FormatURL(idvideo)
+        Down = Downloader(url)
+        # TODO : Genera un retardo
+        Down.setFormat(config.getFormat())
+        Down.setCacheDir(D.path)
+
+        if Down.download():
+            # Si todo salio bien registrarlo en el historial
+            # Obtener el nombre del archivo 
+            path = os.path.splitext(i[0])[0] +"."+ Down.ext
+            print "Descarga de " + path + " finalizo correctamente"
+
+            if D.FileinDir(path):
+                path = D.FileinDir(path)
+                # Renombrar el archivo para Filtrar Caracteres non-ascii
+                path = D.CleanName(path)
+                DB.insertVideo(idvideo,idname,path)
+                ready.append(path)
+            else:
+                # TODO : log error
+                print "Error al buscar el archivo"
+        else:
+            # TODO : log error
+            print "Error al descargar el video"
+            pass
+    return ready
+
+def moveToDest(listfiles):
+    # Mover los archivos correctos al directorio destino
+    D = Directorio(os.path.dirname(listfiles[0]))
+    dest = config.getFinalDir()
+
+    for i in listfiles:
+        D.moveToDest(i,dest)
 
 
 def options(argv):
-    #leer los argumentos de linea de comandos
-    # El modulo config debe de revisar que esta url corresponde a un video 
-    # o a una playlist
+    # leer los argumentos de linea de comandos
+    # Armar el objeto config para la configuracion global
+
 
     keys = {
         "url" : "",
@@ -47,13 +161,16 @@ def options(argv):
         "cache" : "",
         "regurl": False,
         "regformat" : False,
-        "regcache" : False
+        "regcache" : False,
+        "force" : False,
+        "regdest" : False,
+        "dest" : ""
     }
 
     try:
-        options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:",
+        options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:D:i",
                         ["add-url=","url=","video=","format=","set-format=",
-                        "cache=","dir-cache="])
+                        "cache=","dir-cache=,Destino=,force"])
 
     except getopt.GetoptError:
         # TODO : Manejar errores
@@ -106,52 +223,24 @@ def options(argv):
             else:
                 print "La opcion necesita un argumento"
 
+        if opt in ("-D","--Destino"):
+            if arg:
+                keys["regdest"] = True
+                keys["dest"] = arg
+            else:
+                "La opcion necesita un argumento"
+
+        if opt in ("-i","--force"):
+            keys["force"] == True
+
     return keys
 
-def downloadlist(playlist,API):
-    idname = playlist.partition("playlist?list=")[2]
-    # verificar la existencia de la playlist
-    if not idname in API.getSecondPeer(API.getPlaylists()):
-        # TODO : Lanzar error y log
-        return
-    # verificar el nombre de la playlist para 
-    # identificar el directorio
-    name = API.getNameList(idname)
 
-    path = config.getCacheDir() + "/" + name
-    Dir = Directorio(config.getCacheDir())
-    Dir.createSubDir(path)
-    # obtener el ID de la playlist
-
-    lst = API.getVideosList(idname)
-
-    links = API.FormatLst(lst)
-    for x in links:
-        y = links.index(x)
-        print "Descargando: " + lst[y][0]
-        D = Downloader(x)
-
-        D.setCacheDir(path)
-
-        D.setFormat(config.getFormat())
-        # TODO : Hacer barra de progreso 
-        print "Descargado " + D.download()
-
-
-
-# Declando global
-config = Config()
-
-if __name__ == '__main__':
-    # Devuelve una diccionario con los argumentos establecidos
-    keys  = options(sys.argv[1:])
-
+def ArmarConfig(keys):
     urllst = []
 
-
     # Resolver todas las configuraciones
-
-    
+    # Devuelve una lista con todas las url encontradas
 
     if keys["regcache"]:
         config.setCacheDir(keys["cache"],True)
@@ -163,11 +252,27 @@ if __name__ == '__main__':
     elif keys["format"] != 0:
         config.setFormat(keys["format"])
 
+    if keys["regdest"]:
+        config.setFinalDir(keys["dest"])
+
     if keys["regurl"]:
         config.addURL(keys["url"])
     else:
         # Agregar lista a objeto downloader
         urllst.append(keys["url"])
+
+    return urllst
+
+
+
+####################### Codigo Principal #######################
+
+
+if __name__ == '__main__':
+    # Devuelve una diccionario con los argumentos establecidos
+    keys  = options(sys.argv[1:])
+
+    urllst = ArmarConfig(keys)
 
     # Obtener las Url del archivo y unirlas a la lista
     lst = config.getAllURL()
@@ -181,28 +286,22 @@ if __name__ == '__main__':
             urllst.remove(i)
 
 
-    # Obtener autorizacion de la API
-    # TODO : Revisar si anteriormente se realizo la autorizacion
-    #        Cerrar el navegador
-    #        obtener el secret_file y storage con get tomando en cuanta
-    #        el archivo de configuracion
-
-    Auth = Authorized(config.client_secret)
-    Auth.getFlow()
-    Auth.setStorage(config.storage_path)
-
-    service = Auth.getService()
-
-
-    # Obtener las id de los videos de las playlist
-
-    API = APIRequest(service)
-
     for i in urllst:
-        downloadlist(i,API)
+        # TODO : Realizar el multihilo
+        videos = RevisarPlaylist(i)
+        if len(videos) == 0:
+            # Saltarse la playlist
+            continue
 
+        historial = getHistory(i)
 
+        if keys["force"] == False:
+            # Descargar todos los videos sin tomar en cuenta el historial
+            videos = FiltrarRepetidos(videos,historial)
 
-    print "Tarea Finalizada"
+        # Descargar los Videos
+        cache = Download(i,videos)
+        # Mover al directorio definido por el usuario
+        moveToDest(cache)
+        # Eliminar los archivos erroneos
 
-        
