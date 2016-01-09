@@ -2,6 +2,8 @@
 
 import argparse
 import httplib2
+import os
+
 
 from oauth2client import tools
 from oauth2client.file import Storage
@@ -38,6 +40,14 @@ class Authorized(object):
         #Recibe la ruta donde seran almacenados la credencial
         self.storage = Storage(path)
         self.credentials = self.storage.get()
+
+        #TODO : Quizas este argumento sirva para autentificarse 
+        #       De forma remota
+        # if os.environ.has_key("DISPLAY"):
+        #     args=[]
+        # else:
+        #     args=["--noauth_local_webserver"]
+
 
         # Si el usuario nunca a autorizado la aplicacion o la denego
         if self.credentials is None or self.credentials.invalid:
