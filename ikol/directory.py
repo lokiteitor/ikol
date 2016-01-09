@@ -15,6 +15,7 @@
 import os
 import shutil
 import string
+import logging
 
 # Clase que representa un directorio y que su funcion es toda la
 # gestion de los ficheros
@@ -100,7 +101,8 @@ class Directorio(object):
         return lst
 
     def FileinDir(self,name):
-        if name in self.getBaseFiles():
+        lst = self.getBaseFiles()
+        if name in lst:
             path = os.path.join(self.path,name)
         else:
             path = False
@@ -138,6 +140,7 @@ class Directorio(object):
 
         newpath = os.path.dirname(path) + "/" + name + ext
         # TODO : Implementar Filtro de palabras
+        logging.debug("Renombrando de : " + path + " a " + newpath)
         shutil.move(path,newpath)
 
         return newpath
@@ -152,3 +155,7 @@ class Directorio(object):
         shutil.move(orig,dest)
 
         return os.path.join(dest,os.path.basename(orig))
+
+
+if __name__ == '__main__':
+    main()

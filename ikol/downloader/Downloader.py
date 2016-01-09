@@ -79,7 +79,7 @@ class Downloader(object):
                 # Si llega hasta aqui debo encontrar el indice
             except Exception, e:
                 # TODO : genera un error Index manejarlo
-                logging.debug(e)
+                logging.debug(str(e) + str(i))
                 break
                 print e
 

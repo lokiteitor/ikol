@@ -135,39 +135,57 @@ def Download(playlist,videos):
             path = os.path.splitext(i[0])[0] +"."+ Down.ext
             print "Descarga de " + path + " finalizo correctamente"
             logging.info("Descarga de " + path + " finalizada")
+            DB.insertVideo(idvideo,idname,i[0])
+            ready.append(path)
 
-            if D.FileinDir(path):
-                path = D.FileinDir(path)
-                # Renombrar el archivo para Filtrar Caracteres non-ascii
-                path = D.CleanName(path)
-                DB.insertVideo(idvideo,idname,path)
-                ready.append(path)
-            else:
-                print "Error Al buscar el archivo " + path
-                logging.debug("Error al buscar el archivo " + path)
         else:
             print "Error al descargar el video " +i[0]
             logging.warning("Error al descargar el video " +i[0])
 
     logging.debug("Archivos listos " + str(ready))
-    return ready
+    return ready,D.path
 
-def moveToDest(listfiles):
+
+
+def moveToDest(listfiles,dircache):
     # Mover los archivos correctos al directorio destino
-    D = Directorio(os.path.dirname(listfiles[0]))
-    dest = config.getFinalDir()
-
+    logging.debug(str(listfiles))
+    logging.debug(str(dircache))
+    D = Directorio(dircache)
+    dest = os.path.join(config.getFinalDir(),os.path.basename(dircache))
+    
     for i in listfiles:
-        try:
+        if D.FileinDir(i):
+            i = D.FileinDir(i)
+            # Renombrar el archivo para Filtrar Caracteres non-ascii
+            i = D.CleanName(i)
+            try:
 
-            print "Moviendo "+ D.path +" hacia " + dest
-            logging.debug("Moviendo " + dest)
-            D.moveToDest(i,dest)
-        except Exception, e:
-            #TODO : hacer algo con este error decode ascii en print
-            print e
-            logging.debug(e)
+                print "Moviendo "+ D.path +" hacia " + dest
+                logging.debug("Moviendo " + dest)
+                D.moveToDest(i,dest)
+            except Exception, e:
+                #TODO : hacer algo con este error decode ascii en print
+                print e
+                logging.debug(e)
 
+        else:
+            print "Error Al buscar el archivo " + i
+            logging.debug("Error al buscar el archivo " + i)        
+
+def deletedir(dirs):
+    # Elimina el directorio del cache
+    logging.info("Eliminando " + str(dirs) + " de la cache")
+    for root, dirs, files in os.walk(dirs,topdown=False):
+        for name in files:
+            obj =  os.path.join(root, name)
+            os.remove(obj)
+        for name in dirs:
+            if not os.path.islink(name):
+                os.rmdir(os.path.join(root, name))
+
+        os.rmdir(root)
+        logging.info(str(dirs) + " Eliminado")
 
 def options(argv):
     # leer los argumentos de linea de comandos
@@ -286,7 +304,7 @@ def ArmarConfig(keys):
 
 
 if __name__ == '__main__':
-    logging.info("\n\nInicio de operaciones")
+    logging.info("Inicio de operaciones")
     # Devuelve una diccionario con los argumentos establecidos
     keys  = options(sys.argv[1:])
 
@@ -320,9 +338,23 @@ if __name__ == '__main__':
             videos = FiltrarRepetidos(videos,historial)
 
         # Descargar los Videos
-        cache = Download(i,videos)
-        # Mover al directorio definido por el usuario
-        moveToDest(cache)
-        # Eliminar los archivos erroneos
+        # TODO : Genera error
+        # UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 18: ordinal not in range(128)
+        # Habilitarse para eliminar archivos erroneos a futuro
+        Download(i,videos)
+        # DEBUG:
+        dirs = os.listdir(config.getCacheDir())
+        for y in dirs:
+            if os.path.isdir(os.path.join(config.getCacheDir(),y)):
+                cache = os.listdir(os.path.join(config.getCacheDir(),y))
+                dircache = os.path.join(config.getCacheDir(),y)
 
-    logging.info("Finaliza operaciones")
+                logging.debug(str(cache))
+                # Mover al directorio definido por el usuario
+                moveToDest(cache,dircache)
+                #TODO : Eliminar los archivos erroneos
+
+                # Eliminar directorio del cache
+                deletedir(dircache)
+
+    logging.info("Finaliza operaciones\n\n")
