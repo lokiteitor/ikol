@@ -1,13 +1,10 @@
 from setuptools import setup
-import glob
-
-
 
 setup(
 
     name="Ikol-Music Manager",
     # Cambiar esto entre cada lanzamiento
-    version="0.4.dev1",
+    version="0.8",
     description="Organizador de musica autonomo",
     long_description="Programa que permite el manejo autonomo de una coleccion de musica \
                 descargada desde youtube",
@@ -16,6 +13,7 @@ setup(
     url="http://www.desarrolloslkt.tk",
     license="GPL v2",
     scripts=["bin/ikol"],
-    packages=["ikol","ikol.youtube","ikol.sort"]
+    packages=["ikol","ikol.youtube","ikol.sort","ikol.downloader"],
     # Listar dependencias
+    install_requires = ["google-api-python-client","youtube_dl"]
     )
