@@ -46,7 +46,11 @@ class Authorized(object):
             # NOTA Revisar webbrowser libreria estandar
             # Redirigir el navegador a una pagina con javascript para cerrar
             # Para ello debemos usar otro metodo para obtener las credenciales
-            self.credentials = tools.run_flow(self.flow, self.storage)        
+            parser = argparse.ArgumentParser(parents=[tools.argparser])
+            flags = parser.parse_args(args=[])
+            self.credentials = tools.run_flow(self.flow, self.storage,flags)
+
+
 
 
     def getService(self):
