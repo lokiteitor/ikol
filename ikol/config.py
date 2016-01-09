@@ -30,6 +30,11 @@ class Config(directory.Directorio):
     configuracion"""
     def __init__(self):
         super(Config, self).__init__(var.CONFIG_DIR)
+        if not os.path.exists(var.CONFIG_DIR):
+            os.makedirs(var.CONFIG_DIR)
+        if not os.path.exists(var.CACHE_DIR):
+            os.makedirs(var.CACHE_DIR)
+
         # Archivos basicos
         self.ConfDir = var.CONFIG_DIR
         self.client_secret = var.CLIENT_SECRETS_FILE
@@ -54,6 +59,7 @@ class Config(directory.Directorio):
         # TODO : si se establece manualmente revisar que no se sobrepongan
         self.CACHE_DIR = self.getCacheDir()
         self.FINAL_DIR = self.getFinalDir()
+
 
 
     def _CheckDirectory(self):

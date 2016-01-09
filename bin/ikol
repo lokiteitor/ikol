@@ -84,24 +84,29 @@ def getHistory(playlist):
     if DB.playlistExist(idname) == False:        
         API = APIRequest(getAuth())
         lstname = API.getNameList(idname)
-        DB.insertPlaylist(playlist,lstname)
+        DB.insertPlaylist(idname,lstname)
 
     videohst = DB.getAllVideosByPlaylist(idname)
 
     return videohst
 
 def FiltrarRepetidos(video,videohst):
+
     # Se recibe la lista que proporciona la api 
     # asi que se deben separar la tupla luego comparar con el historial +
     # devolver una lista de tuplas con videos repetidos eliminados
     # [(name,idvideo)]
+    rpt = []
     for i in video:
         for x in videohst:
             if i[1] == x[0]:
                 # Eliminar el elemento de la lista video
                 logging.debug(i[1]+ " video repetido" )
-                video.remove(i)
-                continue
+                rpt.append(i)
+                break
+
+    for y in rpt:
+        video.remove(y)
     return video
 
 def Download(playlist,videos):
