@@ -166,7 +166,7 @@ def moveToDest(listfiles,dircache):
             i = D.CleanName(i)
             try:
 
-                print "Moviendo "+ D.path +" hacia " + dest
+                print "Moviendo "+ i +" hacia " + dest
                 logging.debug("Moviendo " + dest)
                 D.moveToDest(i,dest)
             except Exception, e:

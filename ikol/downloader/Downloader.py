@@ -48,12 +48,23 @@ class Downloader(object):
 
 
     def setFormat(self,format):
-        # Establece un formato diferente al de defecto}
+        # Establece un formato diferente al de defecto
+
+        try:
+            
+            Procss = Popen(["youtube-dl","-F",self.URL],stdout=PIPE)
+            rest = Procss.stdout.read()
+            req = rest.split("\n")
+        except Exception, e:
+            print e
+            self.format = var.FORMAT_DEFAULT
+            self.format = var.EXT_DEFAULT
+            logging.debug("Error en el archivo" + self.URL)
+            logging.debug(e)
+            # TODO : Regresar de una manera mas limpia
+            return
 
 
-        Procss = Popen(["youtube-dl","-F",self.URL],stdout=PIPE)
-        rest = Procss.stdout.read()
-        req = rest.split("\n")
 
         # index
         ind = []

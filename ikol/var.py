@@ -27,6 +27,7 @@ YOUTUBE_API_VERSION = "v3"
 YOUTUBE_URL  = "https://www.youtube.com/watch?v="
 
 FORMAT_DEFAULT = 140
+EXT_DEFAULT = "m4a"
 
 
 ### Mensajes ### 
