@@ -148,7 +148,7 @@ class Directorio(object):
         
         if not os.path.exists(dest):
             try:
-                os.mkdir(dest)
+                os.makedirs(dest)
             except Exception, e:
                 raise e
 

@@ -43,10 +43,11 @@ class Config(directory.Directorio):
         self.url_file = var.URL_FILE
         # si el usuario marco manualmente una configuracion no persistente verlo
         # aqui
-        # CACHE_DIR,URL_FILE,FORMAT_DEFAULT,FINAL_DIR
-        self.reg = [False,False,False,False]
+        # CACHE_DIR,URL_FILE,FORMAT_DEFAULT,FINAL_DIR,Codec,kbps
+        self.reg = [False,False,False,False,False,False]
         # Opciones
         self.format = var.FORMAT_DEFAULT
+        self.codec = var.CODEC_DEFAULT
 
         # revisar la integridad antes de continuar
         self._CheckDirectory()
@@ -208,4 +209,44 @@ class Config(directory.Directorio):
     def getLogFile(self):
         return var.LOG_FILE
 
+    def getCodec(self):
+        if self.reg[4]:
+            pass
+        elif self.cfgfile.has_option("OPCIONES","CODEC_DEFAULT"):
+            self.codec = self.cfgfile.get("OPCIONES","CODEC_DEFAULT")
 
+        else:
+            self.cfgfile.set("OPCIONES","CODEC_DEFAULT",var.CODEC_DEFAULT)
+            self.codec = var.CODEC_DEFAULT
+        return self.codec
+
+    def setCodec(self,codec,flag=False):
+        self.reg[4] = True
+        self.codec = codec
+        if flag:
+            self.cfgfile.set("OPCIONES","CODEC_DEFAULT",codec)
+            with open(self.config_file,"w") as f:
+                self.cfgfile.write(f)
+
+        return self.codec
+
+    def getKbps(self):
+        if self.reg[5]:
+            pass
+        elif self.cfgfile.has_option("OPCIONES","KBPS"):
+            self.kpbs = self.cfgfile.get("OPCIONES","KBPS")
+
+        else:
+            self.cfgfile.set("OPCIONES","KBPS",var.KBPS)
+            self.kpbs = var.KBPS
+        return self.kpbs
+
+    def setKbps(self,kpbs,flag=False):
+        self.reg[5] = True
+        self.kpbs = kpbs
+        if flag:
+            self.cfgfile.set("OPCIONES","KBPS",kpbs)
+            with open(self.config_file,"w") as f:
+                self.cfgfile.write(f)
+
+        return self.kpbs

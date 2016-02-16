@@ -19,6 +19,10 @@
 """
     Este archivo iniciara el entorno para la descarga de los videos
 """
+# TODO : la comprobacion de los formatos disponibles en youtube-dl
+            # y ffmpeg deberia de realizarse solo una vez
+
+
 import getopt
 import sys
 import logging
@@ -34,6 +38,7 @@ from ikol.dbregister import DataBase
 from ikol.config import Config
 from ikol.downloader.Downloader import Downloader
 from ikol.directory import Directorio
+from ikol.downloader.Convert import Convert
 
 # Declaracion global
 config = Config()
@@ -152,24 +157,27 @@ def Download(playlist,videos):
 
 
 
-def moveToDest(listfiles,dircache):
+def moveToDest(listfiles,dircache,conv=False):
     # Mover los archivos correctos al directorio destino
     logging.debug(str(listfiles))
     logging.debug(str(dircache))
     D = Directorio(dircache)
     dest = os.path.join(config.getFinalDir(),os.path.basename(dircache))
-    
+
+    if conv:
+        dest = os.path.join(dest,"conv")
+
     for i in listfiles:
         if D.FileinDir(i):
             i = D.FileinDir(i)
             # Renombrar el archivo para Filtrar Caracteres non-ascii
             i = D.CleanName(i)
             try:
-
-                print "Moviendo "+ D.path +" hacia " + dest
+                print "Moviendo "+ i +" hacia " + dest
                 logging.debug("Moviendo " + dest)
                 D.moveToDest(i,dest)
             except Exception, e:
+                
                 #TODO : hacer algo con este error decode ascii en print
                 print e
                 logging.debug(e)
@@ -192,6 +200,27 @@ def deletedir(dirs):
         os.rmdir(root)
         logging.info(str(dirs) + " Eliminado")
 
+def ConvDownload(listfiles,dircache):
+    # convierte la salida usando ffmpeg o avconv
+    # aqui agrego los convertidos para luego moverlos
+    output = []
+
+
+    for i in listfiles:
+        logging.info("convirtiendo : "+str(i))
+
+        source = os.path.join(dircache,i)
+        conv = Convert(source)
+        conv.getBinary()
+        conv.setConfig(config.getCodec(),config.getKbps())
+
+        if conv.convert():
+            output.append(os.path.basename(conv.dest))
+        else:
+            logging.debug("Error de conversion: " + conv.dest)
+
+    return output
+
 def options(argv):
     # leer los argumentos de linea de comandos
     # Armar el objeto config para la configuracion global
@@ -204,13 +233,19 @@ def options(argv):
         "regcache" : False,
         "force" : False,
         "regdest" : False,
-        "dest" : ""
+        "dest" : "",
+        "regcodec" : False,
+        "codec" : "",
+        "regkbps" : False,
+        "kpbs" : "",
+        "convert" : False
     }
     # TODO : Lanzar excepciones que detengan la ejecucion del programa
     try:
-        options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:D:i",
+        options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:D:u:k:it",
                         ["add-url=","url=","video=","format=","set-format=",
-                        "cache=","dir-cache=,Destino=,force"])
+                        "cache=","dir-cache=","Destino=","codec=","kpbs=",
+                        "force","convert"])
 
     except getopt.GetoptError:
         # TODO : Manejar errores
@@ -270,8 +305,25 @@ def options(argv):
             else:
                 "La opcion necesita un argumento"
 
+        if opt in ("-u","--codec"):
+            if arg:
+                keys["regcodec"] = True
+                keys["codec"] = arg
+            else:
+                "La opcion necesita un argumento"
+
+        if opt in ("-k","--kpbs"):
+            if arg:
+                keys["regkbps"] = True
+                keys["kbps"] = arg
+            else:
+                "La opcion necesita un argumento"
+
         if opt in ("-i","--force"):
-            keys["force"] == True
+            keys["force"] = True
+
+        if opt in ("-t","--convert"):
+            keys["convert"] = True
 
     return keys
 
@@ -300,6 +352,13 @@ def ArmarConfig(keys):
     else:
         # Agregar lista a objeto downloader
         urllst.append(keys["url"])
+
+    if keys["regcodec"]:
+        config.setCodec(keys["codec"])
+
+    if keys["regkbps"]:
+        config.setKbps(keys["kpbs"])
+
 
     return urllst
 
@@ -349,13 +408,21 @@ if __name__ == '__main__':
         Download(i,videos)
         # DEBUG:
         dirs = os.listdir(config.getCacheDir())
+        # Revisa los directorios del cache
         for y in dirs:
             if os.path.isdir(os.path.join(config.getCacheDir(),y)):
-                cache = os.listdir(os.path.join(config.getCacheDir(),y))
+                # lista los archivos contenidos dentro del cache
                 dircache = os.path.join(config.getCacheDir(),y)
+                # Archivos descargados
+                cache = os.listdir(dircache)
 
                 logging.debug(str(cache))
                 # Mover al directorio definido por el usuario
+                if keys["convert"]:
+                    # Si el usuario lo especifico Convertir los archivos
+                    out = ConvDownload(cache,dircache)
+                    moveToDest(out,dircache,True)
+
                 moveToDest(cache,dircache)
                 #TODO : Eliminar los archivos erroneos
 
