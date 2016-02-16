@@ -15,7 +15,7 @@ setup(
     scripts=["bin/ikol"],
     packages=["ikol","ikol.youtube","ikol.sort","ikol.downloader"],
     # Listar dependencias
-    install_requires = ["google-api-python-client","youtube_dl"]
+#    install_requires = ["google-api-python-client","youtube_dl"]
     )
 
 

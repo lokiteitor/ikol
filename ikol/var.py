@@ -28,6 +28,8 @@ YOUTUBE_URL  = "https://www.youtube.com/watch?v="
 
 FORMAT_DEFAULT = 140
 EXT_DEFAULT = "m4a"
+CODEC_DEFAULT = "mp3"
+KBPS = "240K"
 
 
 ### Mensajes ### 
@@ -40,7 +42,9 @@ CONFIG_DEFAULT = ["[DIRECTORIOS]",
                     "FINAL_DIR="+FINAL_DIR,
                     "[OPCIONES]",
                     "FORMAT_DEFAULT="+str(FORMAT_DEFAULT),
-                    "DELETE_WRONG_LIST=YES"]
+                    "DELETE_WRONG_LIST=YES",
+                    "CODEC_DEFAULT="+CODEC_DEFAULT,
+                    "KBPS="+KBPS]
 
 
 
