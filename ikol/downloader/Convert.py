@@ -52,7 +52,7 @@ class Convert(object):
         else:
             self.format = var.CODEC_DEFAULT
 
-        if "K" in kbps:
+        if "K" in kbps or "k" in kbps:
             self.kbps = kbps
         else:
             self.kbps = kbps + "K"

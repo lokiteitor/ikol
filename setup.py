@@ -4,7 +4,7 @@ setup(
 
     name="Ikol-Music Manager",
     # Cambiar esto entre cada lanzamiento
-    version="0.8",
+    version="1.0",
     description="Organizador de musica autonomo",
     long_description="Programa que permite el manejo autonomo de una coleccion de musica \
                 descargada desde youtube",
