@@ -141,10 +141,29 @@ class APIRequest(object):
     def getNameList(self,idlst):
         self.getPlaylists()
 
+        name = None
+
         for i in self.lstplaylists:
             if idlst == i[1]:
-
                 name = i[0]
+
+        if name == None:
+            # si la lista no aparece en los registros normales
+            try:
+
+                request = self.srv.playlists().list(
+                        part="snippet",
+                        id=idlst,
+                        fields="items/snippet/title"
+                ).execute()
+
+                name = request["items"][0]["snippet"]["title"]
+
+
+            except Exception, e:
+                print e
+                logging.debug(str(e))
+                name = "Failed"
 
         return name
 

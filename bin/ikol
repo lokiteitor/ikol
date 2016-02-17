@@ -68,14 +68,25 @@ def RevisarPlaylist(playlist):
     idname = playlist.partition("playlist?list=")[2]
     S = getAuth()
     API = APIRequest(S)
-    # verificar la existencia de la playlist
+    # verificar la existencia de la playlist dentro de mis propias playlist
     if not idname in API.getSecondPeer(API.getPlaylists()):
         # TODO : Retirar de lista de playlist
         print "La playlist " + idname +" no existe"
         logging.warning("La playlist " + idname +" no existe")
         videos = []
-        return  
-    videos = API.getVideosList(idname)
+
+        # si la lista no es propia avisar al usuario 
+        print "La lista " + playlist + " no es propia y no se garantiza su integridad"
+        logging.warning("Lista inpropia" + playlist)
+        try:
+            videos = API.getVideosList(idname)
+        except Exception, e:
+            print e
+            logging.debug(str(e))
+            videos = []
+    else:
+
+        videos = API.getVideosList(idname)
 
     return videos
 

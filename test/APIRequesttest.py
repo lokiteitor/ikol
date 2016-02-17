@@ -27,18 +27,18 @@ API = APIRequest(srv)
 print API.getPlaylists()
 
 
-lst = API.getVideosList(API.lstplaylists[5][1])
+#lst = API.getVideosList(API.lstplaylists[5][1])
+lst = API.getVideosList("PL3318306AE34218BC")
 
 print lst
 
 print len(lst)
-
-print API.videos
-
 
 
 print API.getSecondPeer(API.getPlaylists())
 
 for i in API.getPlaylists():
     print API.getNameList(i[1])
+
+print API.getNameList("PL3318306AE34218BC")
 
