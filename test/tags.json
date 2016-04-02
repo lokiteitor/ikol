@@ -1,0 +1,9 @@
+{
+    "tags":{
+        "Artista":"foo",
+        "ArtistaAlbum":"foo",
+        "AlbumArt":"pathtojpg",
+        "Album":"bar",
+        "Genero":"var"
+    }
+}

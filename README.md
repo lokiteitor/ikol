@@ -4,4 +4,5 @@ Music Manager
 - Dependencias
 
 FFmpeg
+Mutagen
 
