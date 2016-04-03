@@ -113,14 +113,27 @@ class Tag(ReaderJSON):
     def setTags(self):
         # no verifica si existe el archivo es lo debe de realizar desde la 
         # la implementacion
+
         # Tags de mutagen ['album'],['artist']['genre']
         for i in self.files:
+            print "Tageando: " + i
+
+            # la imagen debe de estar en formato jpeg
+            picture = ID3(i)
+
+            with open(self.getAlbumArt(),"rb") as img:
+                imgdata = img.read()
+                picture.add(APIC(encoding=3,mime='image/jpeg',type=3,data=imgdata,
+                    desc=self.getAlbumArt()))
+
+            picture.update_to_v24()
+            picture.save(v2_version=3)
+
             if self.format == 'mp3':
                 obj = MP3(i, ID3=EasyID3)
             else:
                 obj = EasyID3(i)
 
-            picture = ID3(i)
 
             obj['album'] = self.getAlbum()
             obj['artist'] = self.getArtista()
@@ -130,10 +143,5 @@ class Tag(ReaderJSON):
 
             obj.save()
 
-            # la imagen debe de estar en formato jpeg
-            with open(self.getAlbumArt(),"rb") as img:
-                imgdata = img.read()
-                picture.add(APIC(encoding=3,mime='image/jpeg',type=3,data=imgdata))
 
-            picture.update_to_v24()
-            picture.save()
+

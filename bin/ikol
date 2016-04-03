@@ -39,6 +39,7 @@ from ikol.config import Config
 from ikol.downloader.Downloader import Downloader
 from ikol.directory import Directorio
 from ikol.downloader.Convert import Convert
+from ikol.tag import Tag
 
 # Declaracion global
 config = Config()
@@ -249,14 +250,16 @@ def options(argv):
         "codec" : "",
         "regkbps" : False,
         "kpbs" : "",
-        "convert" : False
+        "convert" : False,
+        "tag": False,
+        "forcetag": False
     }
     # TODO : Lanzar excepciones que detengan la ejecucion del programa
     try:
-        options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:D:u:k:it",
+        options , arg = getopt.getopt(argv, "A:a:v:f:F:c:C:D:u:k:itTO",
                         ["add-url=","url=","video=","format=","set-format=",
                         "cache=","dir-cache=","Destino=","codec=","kpbs=",
-                        "force","convert"])
+                        "force","convert","tag","tagold"])
 
     except getopt.GetoptError:
         # TODO : Manejar errores
@@ -335,6 +338,13 @@ def options(argv):
 
         if opt in ("-t","--convert"):
             keys["convert"] = True
+
+
+        if opt in ("-T","--tag"):
+            keys["tag"] = True
+
+        if opt in ("-O","--tagold") :
+            keys["forcetag"] = True
 
     return keys
 
@@ -427,17 +437,41 @@ if __name__ == '__main__':
                 # Archivos descargados
                 cache = os.listdir(dircache)
 
-                logging.debug(str(cache))
+                logging.debug("len cache " + str(cache))
                 # Mover al directorio definido por el usuario
                 if keys["convert"]:
                     # Si el usuario lo especifico Convertir los archivos
                     out = ConvDownload(cache,dircache)
                     moveToDest(out,dircache,True)
 
+                    #tagear (el m4a no deberia de tagearse) los archivos si el usuario lo quizo
+                if keys["convert"] and keys["tag"] and keys["forcetag"]:
+                    destconv = os.path.join(config.getFinalDir(),os.path.basename(dircache))
+                    destconv = os.path.join(destconv,"conv")
+                elif keys["convert"] and keys["tag"] and keys["forcetag"] == False:
+                    destconv = dircache
+                    destconv = os.path.join(destconv,"conv")
+                    if os.path.exists(destconv):
+                        print "Se procede a tagear las canciones en: "+destconv
+                        tag = Tag(destconv,config.getCodec())
+                        if tag.getStatus():
+                            tag.loadMusicFiles()
+                            tag.setTags()
+
                 moveToDest(cache,dircache)
                 #TODO : Eliminar los archivos erroneos
 
                 # Eliminar directorio del cache
                 deletedir(dircache)
+
+                if keys["convert"] and keys["tag"] and keys["forcetag"]:
+                    print "Se procede a tagear las canciones en: "+destconv
+                    tag = Tag(destconv,config.getCodec())
+                    if tag.getStatus():
+                        tag.loadMusicFiles()
+                        tag.setTags()
+                  
+
+
 
     logging.info("Finaliza operaciones\n\n")

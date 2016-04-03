@@ -66,7 +66,7 @@ class Convert(object):
         
 
         
-        Procss = Popen([self.binary,"-i","-y",self.path,"-vn","-ar","44100",
+        Procss = Popen([self.binary,"-i",self.path,"-vn","-ar","44100",
                 "-ac","2","-ab",self.kbps,"-f",self.format,self.dest],stdout=PIPE)
 
         if Procss.wait() == 0:
