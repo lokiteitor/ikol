@@ -173,6 +173,7 @@ def moveToDest(listfiles,dircache,conv=False):
     # Mover los archivos correctos al directorio destino
     logging.debug(str(listfiles))
     logging.debug(str(dircache))
+    rtrn = []
     D = Directorio(dircache)
     dest = os.path.join(config.getFinalDir(),os.path.basename(dircache))
 
@@ -187,7 +188,8 @@ def moveToDest(listfiles,dircache,conv=False):
             try:
                 print "Moviendo "+ i +" hacia " + dest
                 logging.debug("Moviendo " + dest)
-                D.moveToDest(i,dest)
+                d = D.moveToDest(i,dest)
+                rtrn.append(d)
             except Exception, e:
                 
                 #TODO : hacer algo con este error decode ascii en print
@@ -196,7 +198,8 @@ def moveToDest(listfiles,dircache,conv=False):
 
         else:
             print "Error Al buscar el archivo " + i
-            logging.debug("Error al buscar el archivo " + i)        
+            logging.debug("Error al buscar el archivo " + i)
+    return rtrn        
 
 def deletedir(dirs):
     # Elimina el directorio del cache
@@ -441,21 +444,24 @@ if __name__ == '__main__':
                 # Mover al directorio definido por el usuario
                 if keys["convert"]:
                     # Si el usuario lo especifico Convertir los archivos
+                    # me devuelve los nombre limpios utilizarlos para los registros
+                    # en la base da datos
                     out = ConvDownload(cache,dircache)
-                    moveToDest(out,dircache,True)
+                    out = moveToDest(out,dircache,True)
 
-                    #tagear (el m4a no deberia de tagearse) los archivos si el usuario lo quizo
+                #tagear (el m4a no deberia de tagearse) los archivos si el usuario lo quizo
+
                 if keys["convert"] and keys["tag"] and keys["forcetag"]:
                     destconv = os.path.join(config.getFinalDir(),os.path.basename(dircache))
                     destconv = os.path.join(destconv,"conv")
                 elif keys["convert"] and keys["tag"] and keys["forcetag"] == False:
-                    destconv = dircache
+                    destconv = os.path.join(config.getFinalDir(),os.path.basename(dircache))
                     destconv = os.path.join(destconv,"conv")
                     if os.path.exists(destconv):
                         print "Se procede a tagear las canciones en: "+destconv
                         tag = Tag(destconv,config.getCodec())
                         if tag.getStatus():
-                            tag.loadMusicFiles()
+                            tag.loadMusicFiles(out)
                             tag.setTags()
 
                 moveToDest(cache,dircache)

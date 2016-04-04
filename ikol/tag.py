@@ -94,6 +94,15 @@ class Tag(ReaderJSON):
     def getStatus(self):
         return self.flag
 
+    def setJsonObject(self,path):
+        if self.flag == False:
+            self.jsonfile = self.SearchJSON(path)
+            if (self.jsonfile != ''):
+                self.flag = True
+                super(Tag, self).__init__(self.jsonfile)
+            else:
+                self.flag = False
+
     def loadMusicFiles(self,files=False):
         # cargar la lista de archivos a modifcar por defecto son los 
         # que se encuentran en la raiz del directorio objetivo
@@ -103,6 +112,15 @@ class Tag(ReaderJSON):
                 if os.path.splitext(i)[1] == '.'+self.format:
 
                     self.files.append(os.path.join(self.path,i))
+        else:
+            for i in files:
+                if os.path.isabs(i) and os.path.isfile(i):
+                    self.files.append(i)
+                else:
+                    filepath = os.path.join(self.path,i)
+                    if os.path.isfile(filepath) and os.path.exists(filepath):
+                        self.files.append(filepath)
+
 
         return self.files
 
