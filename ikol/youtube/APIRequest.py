@@ -40,8 +40,8 @@ class APIRequest(object):
 
         playlstitems = self.srv.playlistItems().list(
             playlistId=playlistID,
-            part="snippet",
-            fields="items/snippet/title,items/snippet/resourceId(videoId),nextPageToken,pageInfo,prevPageToken",
+            part="snippet,status",
+            fields="items/status,items/snippet/title,items/snippet/resourceId(videoId),nextPageToken,pageInfo,prevPageToken",
             maxResults=50
             ).execute()
 
@@ -74,7 +74,8 @@ class APIRequest(object):
         lst = []
         for i in rq:
             for x in i["items"]:
-                lst.append((x["snippet"]["title"],x["snippet"]["resourceId"]["videoId"]))
+                if x["status"]["privacyStatus"] != "private":                    
+                    lst.append((x["snippet"]["title"],x["snippet"]["resourceId"]["videoId"]))
 
         logging.debug(str(lst))
         return lst
