@@ -145,10 +145,18 @@ def Download(playlist,videos):
         # Descargar el video
         idvideo = i[1]
         url = API.FormatURL(idvideo)
-        Down = Downloader(url)
-        # TODO : Genera un retardo
-        Down.setFormat(config.getFormat())
-        Down.setCacheDir(D.path)
+
+        try:
+            Down = Downloader(url)
+            # TODO : Genera un retardo
+            Down.setFormat(config.getFormat())
+            Down.setCacheDir(D.path)            
+        except Exception, e:
+            # no descargar
+            print e
+            logging.warning("Error al intentar descargar el archivo" + idvideo)
+            continue
+
         print "Descargando video " + i[0]
         logging.info("Inicio Descarga " + i[0])
         if Down.download():
